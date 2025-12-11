@@ -39,35 +39,33 @@ def get_all_paths(graph):
     
     return num_paths
 
-def get_all_paths2(graph):
+def get_all_paths2(node, passed_dac = False, passed_fft = False, memo = defaultdict(int)):
     """
     Given a graph, we need to find all paths from svr to out that visits both dac and fft
     """
-    start = "svr"
-    end = "out"
 
-    queue = deque([(start, False, False)]) # (node, passed_dac, passed_fft)
-    num_paths = 0
-
-    while queue:
-        curr_node, passed_dac, passed_fft = queue.popleft()
-        if curr_node == end and passed_dac and passed_fft:
-            num_paths += 1
-        
-        if curr_node == "dac":
-            passed_dac = True
-        if curr_node == "fft":
-            passed_fft = True
-
-    for neighbor in graph[curr_node]:
-            queue.append((neighbor, passed_dac, passed_fft))
+    # DFS with Caching
+    # Base Case
+    if node == "out" and passed_dac and passed_fft:
+        return 1
+    elif node == "dac":
+        passed_dac = True
+    elif node == "fft":
+        passed_fft = True
     
-    return num_paths
+    # If not memoized already, take the sum of all neighbors and memoize
+    if (node, passed_dac, passed_fft) not in memo:
+        for neighbor in graph[node]:
+            memo[(node, passed_dac, passed_fft)] += get_all_paths2(neighbor, passed_dac, passed_fft, memo)
+    
+    # Return memoized case
+    return memo[(node, passed_dac, passed_fft)]
+
         
 
 
 for file in test_files:
     graph = parse_inputs(file)
     num_paths = get_all_paths(graph)
-    num_paths2 = get_all_paths2(graph)
+    num_paths2 = get_all_paths2("svr", memo = defaultdict(int))
     print(num_paths, num_paths2)
