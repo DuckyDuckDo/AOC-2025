@@ -24,11 +24,28 @@ def parse_problem(problem):
     configuration = list(problem[0])[1:-1]
     buttons = list(problem[1:len(problem) - 1])
     buttons = [ast.literal_eval(x) for x in buttons]
+    joltage = list(ast.literal_eval(problem[-1]))
     for i, button in enumerate(buttons):
         if isinstance(button, int):
             buttons[i] = (button, )
-    start_config = [x == "#" for x in configuration]
+    start_config = ""
+    for x in configuration:
+        if x == "#":
+            start_config += "1"
+        else:
+            start_config += "0"
+
+    print(start_config, buttons, joltage)
     return start_config, buttons
+
+def press_button(button, config):
+    """
+    Processes the press of a button
+    """
+    config = list(config)
+    for loc in button:
+        config[loc] = "1" if config[loc] == "0" else "0"
+    return "".join(config)
 
 def solve_problem(problem):
     """
@@ -36,7 +53,7 @@ def solve_problem(problem):
     configuration (aka go from configuration to an all off state)
     """
     start_config, buttons = parse_problem(problem)
-    end_config = [False] * len(start_config)
+    end_config = "0" * len(start_config)
 
     # Keeps track of visited in case we hit cycles
     visited = set()
@@ -49,15 +66,15 @@ def solve_problem(problem):
             return curr_step
 
         visited.add(curr_config)
-        
-
-
-
-
-
-
-
+        for button in buttons:
+            new_config = press_button(button, curr_config)
+            if new_config not in visited:
+                queue.append((curr_step + 1, new_config))
+    return 0
+    
 for file in test_files:
     problems = parse_inputs(file)
+    result1 = 0
     for problem in problems:
-        solve_problem(problem)
+        result1 += solve_problem(problem)
+    print(result1)
