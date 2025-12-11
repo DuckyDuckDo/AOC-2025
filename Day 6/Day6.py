@@ -1,6 +1,6 @@
 # Part 1: Given a row of numbers and a row of operations, perform the operations by column and return the sums
 
-# Part 2: Invalid numbers are now any that are made up of a repeated sequence any number of times
+# Part 2: Parse the input file until there are empty strings, collect all nums and perform all operationsx
 
 test_files =  [
     'test.txt',
@@ -46,7 +46,7 @@ def process_problems1(inputs):
 
     return total_sum
 
-def process_problem(nums, operation):
+def process_operation(nums, operation):
     """
     Perform the column wise operation digit wise 64, 23, 314, + becomes 623 + 431 + 4
     123, 45, 6 becomes 1 + 24 + 356
@@ -64,7 +64,7 @@ def process_problem(nums, operation):
 def process_problems2(inputs):
     """
     Given an array of arrays we need to perform the operations but now we read it by column of digits right to left. 
-    So 64, 23, 314, + becomes 623 + 431 + 4
+    So 64 , 23 , 314, + becomes 623 + 431 + 4, while 123, 45,  6, * becomes 1 * 24 * 256, based on column of digits placement
     Use process_column to perform the digitwise column operation
     """
     digits = [''] * (len(inputs) - 1)# whatever digit is in a certain column
@@ -73,9 +73,7 @@ def process_problems2(inputs):
     total_sum = 0
     # Loop through all the columns
     for i in range(len(inputs[0])):
-
-
-        # Loop through each of the four lines, update digits for first 3, and operation for the last
+        # Loop through each of the input lines except the last one, update digits and operations
         for j in range(0, len(inputs) - 1):
             digits[j] = inputs[j][i]
         if inputs[-1][i] != " ":
@@ -83,7 +81,7 @@ def process_problems2(inputs):
 
         # If we reach an empty column and have an operation, perform and sum the operation, and reset both variables
         if len("".join(digits).strip()) == 0 and current_operation in set(["*", "+"]):
-            total_sum += process_problem(current_nums, current_operation)
+            total_sum += process_operation(current_nums, current_operation)
             current_nums = []
             current_operation = ""
 
@@ -91,7 +89,7 @@ def process_problems2(inputs):
             current_nums.append(int("".join(digits)))
 
     # Do the final problem that was never processed, because there was never an empty column at the end
-    total_sum += process_problem(current_nums, current_operation)
+    total_sum += process_operation(current_nums, current_operation)
     return total_sum
 
 for file in test_files:
