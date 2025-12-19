@@ -8,6 +8,7 @@ test_files =  [
     'input.txt',
                ]
 
+
 def parse_inputs(file):
     graph = defaultdict(list)
     with open(file) as file:
